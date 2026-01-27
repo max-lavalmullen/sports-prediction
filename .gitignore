@@ -1,0 +1,40 @@
+# Environment files with secrets
+.env
+.env.local
+.env.*.local
+backend/.env
+frontend/.env
+
+# Claude Code settings (may contain embedded credentials)
+.claude/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+.venv/
+
+# Node
+node_modules/
+dist/
+build/
+*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Logs
+*.log
+logs/
+
+# Docker volumes (if using local bind mounts)
+postgres_data/
+redis_data/

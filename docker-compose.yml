@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  # Python Backend
+  backend:
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: sports_backend
+    restart: unless-stopped
+    ports:
+      - "8005:8000"  # Changed from 8000 to 8005 to avoid conflict with Paperless
+    environment:
+      - DATABASE_URL=postgresql://sports:sports_password@db:5432/sports_prediction
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      - db
+      - redis
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: sports_frontend
+    restart: unless-stopped
+    ports:
+      - "3005:80"    # Changed to 3005:80. Nginx listens on 80. Avoids conflict with Grafana (3000).
+    environment:
+      - VITE_API_URL=http://192.168.1.254:8005  # Point to the backend on the Pi's IP and new port
+    depends_on:
+      - backend
+
+  # Database
+  db:
+    image: postgres:15-alpine
+    container_name: sports_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: sports
+      POSTGRES_PASSWORD: sports_password
+      POSTGRES_DB: sports_prediction
+    volumes:
+      - sports_data:/var/lib/postgresql/data
+
+  # Redis
+  redis:
+    image: redis:7-alpine
+    container_name: sports_redis
+    restart: unless-stopped
+
+  # Tunnel for Frontend
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: sports_tunnel
+    restart: unless-stopped
+    command: tunnel --url http://frontend:80  # Point to Nginx port 80
+    depends_on:
+      - frontend
+
+volumes:
+  sports_data:

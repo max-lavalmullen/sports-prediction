@@ -1,0 +1,17 @@
+{
+  "timestamp": "2026-01-14T23:27:39.746276",
+  "results": {
+    "nba": {
+      "error": "Must have at least 1 validation dataset for early stopping."
+    },
+    "nfl": {
+      "error": "Must have at least 1 validation dataset for early stopping."
+    },
+    "mlb": {
+      "error": "Must have at least 1 validation dataset for early stopping."
+    },
+    "soccer": {
+      "error": "No data available"
+    }
+  }
+}
