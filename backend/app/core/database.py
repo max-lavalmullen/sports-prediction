@@ -60,3 +60,31 @@ async def get_db() -> AsyncSession:
             yield session
         finally:
             await session.close()
+
+
+def get_db_connection():
+    """
+    Get a synchronous database connection for non-async contexts.
+    Used by services that need sync DB access (e.g., Celery tasks, bots).
+
+    Returns a psycopg2 connection or None on failure.
+    """
+    import psycopg2
+    from urllib.parse import urlparse
+
+    try:
+        # Parse the async URL and convert to sync
+        url = settings.DATABASE_URL
+        parsed = urlparse(url)
+
+        conn = psycopg2.connect(
+            host=parsed.hostname,
+            port=parsed.port or 5432,
+            database=parsed.path[1:],  # Remove leading /
+            user=parsed.username,
+            password=parsed.password
+        )
+        return conn
+    except Exception as e:
+        logger.error(f"Failed to create sync DB connection: {e}")
+        return None

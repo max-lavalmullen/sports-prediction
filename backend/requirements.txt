@@ -1,78 +1,78 @@
 # Web Framework
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
-python-multipart==0.0.6
-websockets==12.0
+fastapi
+uvicorn[standard]
+python-multipart
+websockets
 
 # Database
-sqlalchemy==2.0.25
-psycopg2-binary==2.9.9
-alembic==1.13.1
-asyncpg==0.29.0
+sqlalchemy
+psycopg2-binary
+alembic
+asyncpg
 
 # Redis & Caching
-redis==5.0.1
-hiredis==2.3.2
+redis
+hiredis
 
 # Task Queue
-celery==5.3.6
-celery[redis]==5.3.6
+celery
+celery[redis]
 
 # ML & Data Science
-numpy==1.26.3
-pandas==2.2.0
-scikit-learn==1.4.0
-xgboost==2.0.3
-lightgbm==4.3.0
-catboost==1.2.2
-optuna==3.5.0
-shap==0.44.1
+numpy
+pandas
+scikit-learn
+xgboost
+lightgbm
+catboost
+optuna
+shap
 
 # Deep Learning (comment out if CPU-only)
-torch==2.2.0
-transformers==4.37.2
+torch
+transformers
 
 # Data Collection
-httpx==0.26.0
-aiohttp==3.9.3
-beautifulsoup4==4.12.3
-playwright==1.41.0
-feedparser==6.0.11
+httpx
+aiohttp
+beautifulsoup4
+playwright
+feedparser
 
 # Sports Data APIs (Free/Open Source)
-nba_api==1.4.1
-nfl_data_py==0.3.1
-pybaseball==2.2.7
-sportsreference==0.5.2
-soccerdata==1.8.8
+nba_api
+nfl_data_py
+pybaseball
+sportsreference
+soccerdata
 
 # NLP for news processing
-spacy==3.7.4
+spacy
 
 # Utilities
-python-dotenv==1.0.1
-pydantic==2.6.0
-pydantic-settings==2.1.0
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-tenacity==8.2.3
-loguru==0.7.2
+python-dotenv
+pydantic
+pydantic-settings
+python-jose[cryptography]
+passlib[bcrypt]
+tenacity
+loguru
 tqdm
-pytz==2023.3
+pytz
 
 # Testing
-pytest==8.0.0
-pytest-asyncio==0.23.5
-pytest-cov==4.1.0
-httpx==0.26.0
+pytest
+pytest-asyncio
+pytest-cov
+httpx
 
 # MLOps
-mlflow==2.10.0
-joblib==1.3.2
+mlflow
+joblib
 
 # Statistics
-scipy==1.12.0
-statsmodels==0.14.1
+scipy
+statsmodels
 
 # Typing
-types-redis==4.6.0.11
+types-redis

@@ -5,7 +5,7 @@ Runs historical simulations of betting strategies.
 
 import numpy as np
 from datetime import date, datetime, timedelta
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Tuple
 from loguru import logger
 from sqlalchemy import select, and_, func
 
@@ -217,6 +217,42 @@ class BacktestService:
 
         return bets
 
+    def _calculate_stake(
+        self,
+        win_prob: float,
+        decimal_odds: float,
+        kelly_fraction: float,
+        max_stake_pct: float,
+        bankroll: float
+    ) -> float:
+        """
+        Calculate stake using Kelly Criterion.
+
+        Kelly formula: f* = (bp - q) / b
+        Where:
+            b = decimal odds - 1 (net odds)
+            p = probability of winning
+            q = probability of losing (1 - p)
+        """
+        b = decimal_odds - 1
+        p = win_prob
+        q = 1 - p
+
+        # Full Kelly
+        if b <= 0:
+            return 0
+
+        full_kelly = (b * p - q) / b
+
+        # Apply fractional Kelly and cap
+        if full_kelly <= 0:
+            return 0
+
+        stake_pct = min(full_kelly * kelly_fraction, max_stake_pct)
+        stake = bankroll * stake_pct
+
+        return max(0, stake)
+
     def _settle_bet(self, bet, home_score, away_score) -> Tuple[str, float]:
         """Settle a bet and return (result, pnl)."""
         b_type = bet['bet_type']
@@ -267,20 +303,36 @@ class BacktestService:
     def _calculate_metrics(self, bets, initial, final, equity) -> Dict[str, Any]:
         """Calculate performance metrics."""
         if not bets:
-            return {"roi": 0, "total_bets": 0}
-            
+            return {"roi": 0, "total_bets": 0, "wins": 0, "pushes": 0, "win_rate": 0}
+
         wins = sum(1 for b in bets if b['result'] == 'win')
+        pushes = sum(1 for b in bets if b['result'] == 'push')
+        losses = len(bets) - wins - pushes
         total_staked = sum(b['stake'] for b in bets)
         total_profit = final - initial
-        
+
+        # Calculate max drawdown
+        peak = initial
+        max_dd = 0
+        for point in equity:
+            bankroll = point.get('bankroll', initial)
+            if bankroll > peak:
+                peak = bankroll
+            dd = (peak - bankroll) / peak if peak > 0 else 0
+            max_dd = max(max_dd, dd)
+
         return {
             "total_bets": len(bets),
             "wins": wins,
-            "win_rate": wins / len(bets),
+            "losses": losses,
+            "pushes": pushes,
+            "win_rate": wins / len(bets) if bets else 0,
             "total_profit": total_profit,
             "roi": total_profit / total_staked if total_staked > 0 else 0,
             "initial_bankroll": initial,
-            "final_bankroll": final
+            "final_bankroll": final,
+            "max_drawdown": max_dd,
+            "max_drawdown_pct": max_dd * 100
         }
 
 # Singleton

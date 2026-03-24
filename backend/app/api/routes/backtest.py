@@ -198,20 +198,25 @@ async def _run_backtest(request: BacktestRequest, db: AsyncSession) -> BacktestR
     bets = result.get('total_bets_count', 0)
     wins = result.get('wins', 0)
     
+    # Calculate total staked safely
+    roi = result.get('roi', 0)
+    total_profit = result.get('total_profit', 0)
+    total_staked = total_profit / roi if roi != 0 else 0
+
     return BacktestResult(
         total_bets=bets,
         wins=wins,
-        losses=bets - wins - result.get('pushes', 0),
+        losses=result.get('losses', bets - wins - result.get('pushes', 0)),
         pushes=result.get('pushes', 0),
         win_rate=result.get('win_rate', 0),
         initial_bankroll=request.initial_bankroll,
         final_bankroll=result.get('final_bankroll', request.initial_bankroll),
-        total_profit=result.get('total_profit', 0),
-        total_staked=result.get('total_profit', 0) / result.get('roi', 1) if result.get('roi', 0) != 0 else 0,
-        roi=result.get('roi', 0),
-        yield_pct=result.get('roi', 0), # Simplified
-        max_drawdown=0, # TODO
-        max_drawdown_pct=0,
+        total_profit=total_profit,
+        total_staked=total_staked,
+        roi=roi,
+        yield_pct=roi,
+        max_drawdown=result.get('max_drawdown', 0),
+        max_drawdown_pct=result.get('max_drawdown_pct', 0),
         sharpe_ratio=None,
         sortino_ratio=None,
         avg_clv=0,
